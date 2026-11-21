@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block content %}<h1>Comment analysis</h1><p class="muted">Video ID: {{video_id}} · {{comments_count}} comments checked</p>
+{% if moments %}<div class="panel"><h2>Most mentioned moments</h2><p class="muted">Ranked by explicit timestamp mentions, likes and replies.</p>
+<table><tr><th>Timestamp</th><th>Mentions</th><th>Likes</th><th>Replies</th><th>Score</th></tr>
+{% for m in moments %}<tr><td><b>{{m.time}}</b></td><td>{{m.mentions}}</td><td>{{m.likes}}</td><td>{{m.replies}}</td><td>{{m.score}}</td></tr>{% endfor %}</table>
+<p>Clip banane ke liye timestamp ko seconds mein convert karein. Example: 02:15 = 135 seconds.</p></div>{% else %}<div class="panel"><h2>No timestamp comments found</h2><p>Is video ke retrieved comments mein explicit timestamps nahi mile. Transcript/topic analysis abhi configured nahi hai; video ko manually review karke start times dein.</p></div>{% endif %}
+<a class="button secondary" href="/">Back to dashboard</a>{% endblock %}

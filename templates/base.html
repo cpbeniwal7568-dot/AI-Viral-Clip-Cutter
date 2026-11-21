@@ -1,0 +1,5 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Viral Clip Cutter</title><link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"></head>
+<body><header><a href="/">✂ AI Viral Clip Cutter</a><span>Creator Studio</span></header><main>
+{% with messages = get_flashed_messages() %}{% if messages %}<div class="alerts">{% for m in messages %}<p>{{m}}</p>{% endfor %}</div>{% endif %}{% endwith %}
+{% block content %}{% endblock %}</main><footer>Use only videos you own or have permission to edit.</footer></body></html>

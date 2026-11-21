@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block content %}
+<section class="hero"><p class="eyebrow">AI-ASSISTED SHORT-FORM WORKFLOW</p><h1>Find the moment.<br><span>Make the clip.</span></h1><p>Analyse timestamp mentions in comments, then create vertical clips from your permitted video file.</p></section>
+<div class="grid">
+<section class="panel"><h2>1. Analyse YouTube comments</h2><p class="muted">Find timestamps explicitly mentioned by commenters. This does not prove the moment is viral.</p>
+<form method="post" action="/analyze"><label>YouTube video URL</label><input name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." required><button>Analyse comments</button></form></section>
+<section class="panel"><h2>2. Create clips from video</h2><p class="muted">Upload a local video file you own or are authorised to edit.</p>
+<form method="post" action="/process" enctype="multipart/form-data"><label>Video file</label><input type="file" name="video" accept="video/*" required>
+<div class="two"><div><label>Number of clips</label><input type="number" name="count" min="1" max="30" value="5"></div><div><label>Clip duration (seconds)</label><input type="number" name="duration" min="5" max="180" value="30"></div></div>
+<label>Start times in seconds (comma separated, optional)</label><input name="starts" placeholder="e.g. 45, 120, 305"><small>Blank chhodne par video ke start se ek clip banegi. Analyse page se timestamps copy kar sakte hain.</small><button>Create MP4 clips</button></form></section></div>
+<section class="note"><b>Important:</b> YouTube comments may not contain timestamps. If no timestamp mentions are found, use your own review/transcript to choose start times. This starter version does not scrape or download YouTube videos.</section>
+{% endblock %}

@@ -1,0 +1,1 @@
+{% extends "base.html" %}{% block content %}<h1>Your clips are ready</h1><p class="muted">Job {{job}}</p><div class="panel">{% for f in files %}<div class="file"><span>🎬 {{f}}</span><a href="{{url_for('download', filename=f)}}">Download MP4</a></div>{% endfor %}</div><a class="button secondary" href="/">Create more clips</a>{% endblock %}
