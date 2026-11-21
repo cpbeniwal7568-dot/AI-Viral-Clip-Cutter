@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: ai-viral-clip-cutter
+    runtime: docker
+    plan: free
+    envVars:
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: YOUTUBE_API_KEY
+        sync: false
