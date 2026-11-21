@@ -1,11 +1,134 @@
-{% extends "base.html" %}{% block content %}
-<section class="hero"><p class="eyebrow">AI-ASSISTED SHORT-FORM WORKFLOW</p><h1>Find the moment.<br><span>Make the clip.</span></h1><p>Analyse timestamp mentions in comments, then create vertical clips from your permitted video file.</p></section>
+
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero">
+    <p class="eyebrow">AI-ASSISTED SHORT-FORM WORKFLOW</p>
+    <h1>Find the moment.<br><span>Make the clip.</span></h1>
+    <p>Analyse timestamp mentions in comments and YouTube Live Chat, then create vertical clips from your permitted video file.</p>
+</section>
+
 <div class="grid">
-<section class="panel"><h2>1. Analyse YouTube comments</h2><p class="muted">Find timestamps explicitly mentioned by commenters. This does not prove the moment is viral.</p>
-<form method="post" action="/analyze"><label>YouTube video URL</label><input name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." required><button>Analyse comments</button></form></section>
-<section class="panel"><h2>2. Create clips from video</h2><p class="muted">Upload a local video file you own or are authorised to edit.</p>
-<form method="post" action="/process" enctype="multipart/form-data"><label>Video file</label><input type="file" name="video" accept="video/*" required>
-<div class="two"><div><label>Number of clips</label><input type="number" name="count" min="1" max="30" value="5"></div><div><label>Clip duration (seconds)</label><input type="number" name="duration" min="5" max="180" value="30"></div></div>
-<label>Start times in seconds (comma separated, optional)</label><input name="starts" placeholder="e.g. 45, 120, 305"><small>Blank chhodne par video ke start se ek clip banegi. Analyse page se timestamps copy kar sakte hain.</small><button>Create MP4 clips</button></form></section></div>
-<section class="note"><b>Important:</b> YouTube comments may not contain timestamps. If no timestamp mentions are found, use your own review/transcript to choose start times. This starter version does not scrape or download YouTube videos.</section>
+
+    <section class="panel">
+        <h2>1. Analyse YouTube comments</h2>
+        <p class="muted">Find timestamps explicitly mentioned by commenters. This does not prove the moment is viral.</p>
+
+        <form method="post" action="/analyze">
+            <label>YouTube video URL</label>
+            <input name="youtube_url" placeholder="https://www.youtube.com/watch?v=..." required>
+            <button>Analyse comments</button>
+        </form>
+    </section>
+
+    <section class="panel">
+        <h2>2. Analyse YouTube Live Chat</h2>
+        <p class="muted">Analyse messages from an active YouTube Live stream and find popular keywords.</p>
+
+        <form id="liveChatForm">
+            <label>YouTube Live URL</label>
+            <input name="youtube_url" placeholder="https://www.youtube.com/live/..." required>
+            <button type="submit" id="liveChatButton">Analyse Live Chat</button>
+        </form>
+
+        <div id="liveChatStatus" class="muted" style="margin-top:15px;"></div>
+        <div id="liveChatResults" style="margin-top:15px;"></div>
+    </section>
+
+    <section class="panel">
+        <h2>3. Create clips from video</h2>
+        <p class="muted">Upload a local video file you own or are authorised to edit.</p>
+
+        <form method="post" action="/process" enctype="multipart/form-data">
+            <label>Video file</label>
+            <input type="file" name="video" accept="video/*" required>
+
+            <div class="two">
+                <div>
+                    <label>Number of clips</label>
+                    <input type="number" name="count" min="1" max="30" value="5">
+                </div>
+                <div>
+                    <label>Clip duration (seconds)</label>
+                    <input type="number" name="duration" min="5" max="180" value="30">
+                </div>
+            </div>
+
+            <label>Start times in seconds (comma separated, optional)</label>
+            <input name="starts" placeholder="e.g. 45, 120, 305">
+            <small>Blank chhodne par video ke start se ek clip banegi. Analyse page se timestamps copy kar sakte hain.</small>
+
+            <button>Create MP4 clips</button>
+        </form>
+    </section>
+
+</div>
+
+<section class="note">
+    <b>Important:</b> YouTube comments may not contain timestamps. Live Chat messages show when a message was sent, not necessarily the exact time of the video event. This starter version does not scrape or download YouTube videos.
+</section>
+
+<script>
+document.getElementById("liveChatForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const button = document.getElementById("liveChatButton");
+    const status = document.getElementById("liveChatStatus");
+    const results = document.getElementById("liveChatResults");
+
+    button.disabled = true;
+    button.textContent = "Analysing...";
+    status.textContent = "Please wait, Live Chat analyse ho rahi hai...";
+    results.replaceChildren();
+
+    try {
+        const response = await fetch("/analyze-live", {
+            method: "POST",
+            body: new FormData(form)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.error || "Analysis failed.");
+        }
+
+        status.textContent = "Analysis complete! Total messages: " + data.messages_count;
+
+        const heading = document.createElement("h3");
+        heading.textContent = "Popular keywords";
+        results.appendChild(heading);
+
+        if (data.highlights && data.highlights.length) {
+            data.highlights.forEach(function(item) {
+                const p = document.createElement("p");
+                p.textContent = item[0] + " — " + item[1] + " mentions";
+                results.appendChild(p);
+            });
+        } else {
+            const p = document.createElement("p");
+            p.textContent = "Abhi popular keywords nahi mile.";
+            results.appendChild(p);
+        }
+
+        const messageHeading = document.createElement("h3");
+        messageHeading.textContent = "Recent chat messages";
+        results.appendChild(messageHeading);
+
+        (data.messages || []).slice(0, 20).forEach(function(message) {
+            const p = document.createElement("p");
+            p.textContent = (message.published_at || "") + " — " + message.text;
+            results.appendChild(p);
+        });
+
+    } catch (error) {
+        status.textContent = "Error: " + error.message;
+    } finally {
+        button.disabled = false;
+        button.textContent = "Analyse Live Chat";
+    }
+});
+</script>
+
 {% endblock %}
