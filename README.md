@@ -68,3 +68,4 @@ This is a functional starter project, not a fully autonomous viral-moment predic
 
 ## Deployment update
 Flask deployment configuration updated.
+Deployment trigger update
